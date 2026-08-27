@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="sl" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ISO 13855 — Varnostne Razdalje</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              orange: '#f97316',
+              amber: '#d97706',
+              cyan: '#06b6d4',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Modern Clean Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400..700;1,400..700&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      letter-spacing: -0.011em;
+    }
+    .font-mono-num {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    sub {
+      bottom: -0.2em;
+      font-size: 75%;
+    }
+  </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen p-4 md:p-8 antialiased">
+
+  <div class="max-w-7xl mx-auto space-y-6">
+    
+    <!-- HEADER -->
+    <header class="flex flex-col md:flex-row md:items-center md:justify-between border-b border-zinc-800/80 pb-5 gap-4">
+      <div class="flex items-center gap-3.5">
+        <div class="p-3 bg-orange-500/10 text-orange-500 rounded-xl border border-orange-500/20">
+          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-2xl font-extrabold tracking-tight text-white">ISO 13855 Kalkulator Varnostne Razdalje</h1>
+            <span class="px-2.5 py-0.5 text-[11px] font-mono-num bg-orange-500/10 text-orange-400 border border-orange-500/25 rounded-md font-semibold">SIST EN ISO 13855</span>
+          </div>
+          <p class="text-xs text-zinc-400 mt-1 font-normal">Izračun minimalne oddaljenosti svetlobnih zaves za tehnično ponudbo in oceno tveganja</p>
+        </div>
+      </div>
+      
+      <!-- Preset Quick Load Buttons -->
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-xs text-zinc-400 font-medium mr-1">Hitri vnos:</span>
+        <button onclick="applyPreset('robot')" class="px-3 py-1.5 text-xs font-semibold bg-zinc-900 hover:bg-zinc-800 text-zinc-200 rounded-lg border border-zinc-800 transition shadow-sm">
+          Robot (150 ms)
+        </button>
+        <button onclick="applyPreset('cylinder')" class="px-3 py-1.5 text-xs font-semibold bg-zinc-900 hover:bg-zinc-800 text-zinc-200 rounded-lg border border-zinc-800 transition shadow-sm">
+          Pnevmatika (80 ms)
+        </button>
+        <button onclick="applyPreset('press')" class="px-3 py-1.5 text-xs font-semibold bg-zinc-900 hover:bg-zinc-800 text-zinc-200 rounded-lg border border-zinc-800 transition shadow-sm">
+          Stiskalnica (260 ms)
+        </button>
+      </div>
+    </header>
+
+    <!-- KPI DASHBOARD CARDS -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <!-- KPI 1: Safety Distance S -->
+      <div class="bg-zinc-900/90 border border-orange-500/30 rounded-xl p-5 shadow-lg relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-1.5 h-full bg-orange-500"></div>
+        <div class="text-zinc-400 text-xs font-semibold uppercase tracking-wider">Varnostna razdalja (S)</div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span id="kpi-s-mm" class="text-4xl font-extrabold font-mono-num text-orange-400">0</span>
+          <span class="text-zinc-400 font-semibold text-sm">mm</span>
+        </div>
+        <div class="text-xs text-zinc-400 mt-2 flex justify-between pt-2 border-t border-zinc-800/60">
+          <span>Enako: <strong id="kpi-s-cm" class="text-zinc-200 font-mono-num">0.0</strong> cm</span>
+          <span id="kpi-s-status" class="text-orange-400 font-semibold">ISO 13855</span>
+        </div>
+      </div>
+
+      <!-- KPI 2: Total Stopping Time T -->
+      <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 shadow-lg">
+        <div class="text-zinc-400 text-xs font-semibold uppercase tracking-wider">Skupni čas ustavljanja (T)</div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span id="kpi-t-ms" class="text-3xl font-bold font-mono-num text-cyan-400">0</span>
+          <span class="text-zinc-400 font-semibold text-sm">ms</span>
+        </div>
+        <div class="text-xs text-zinc-400 mt-2 pt-2 border-t border-zinc-800/60">
+          Odzivni čas: <span id="kpi-t-sec" class="font-mono-num text-zinc-200 font-semibold">0.000</span> s
+        </div>
+      </div>
+
+      <!-- KPI 3: K & C Parameters -->
+      <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 shadow-lg">
+        <div class="text-zinc-400 text-xs font-semibold uppercase tracking-wider">Hitrost (K) & Globina vstopa (C)</div>
+        <div class="mt-2 flex items-baseline gap-3">
+          <div>
+            <span class="text-xs text-zinc-500">K: </span>
+            <span id="kpi-k-val" class="text-xl font-bold font-mono-num text-emerald-400">2000</span>
+            <span class="text-xs text-zinc-500">mm/s</span>
+          </div>
+          <div class="border-l border-zinc-700 pl-3">
+            <span class="text-xs text-zinc-500">C: </span>
+            <span id="kpi-c-val" class="text-xl font-bold font-mono-num text-purple-400">0</span>
+            <span class="text-xs text-zinc-500">mm</span>
+          </div>
+        </div>
+        <div id="kpi-k-note" class="text-[11px] text-zinc-400 mt-2 pt-2 border-t border-zinc-800/60 truncate">Osnovna hitrost približevanja</div>
+      </div>
+
+      <!-- KPI 4: Opening Area & Diag -->
+      <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 shadow-lg">
+        <div class="text-zinc-400 text-xs font-semibold uppercase tracking-wider">Odprtina Celice</div>
+        <div class="mt-2 flex items-baseline gap-2">
+          <span id="kpi-opening-dim" class="text-xl font-bold font-mono-num text-zinc-100">1000 × 1600</span>
+          <span class="text-zinc-400 text-xs">mm</span>
+        </div>
+        <div class="text-xs text-zinc-400 mt-2 flex justify-between pt-2 border-t border-zinc-800/60">
+          <span>Površina: <strong id="kpi-opening-area" class="font-mono-num text-zinc-200">1.60</strong> m²</span>
+          <span>Diag: <strong id="kpi-opening-diag" class="font-mono-num text-zinc-200">1887</strong> mm</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- MAIN CALCULATOR & VISUALIZATION -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- LEFT COLUMN: INPUT PARAMETERS (5 cols) -->
+      <div class="lg:col-span-5 space-y-5">
+        
+        <!-- Opening Dimensions Panel -->
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 shadow-lg space-y-4">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-orange-400 flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+            1. Dimenzije odprtine celice
+          </h2>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-medium text-zinc-300 mb-1">Širina odprtine (W) [mm]</label>
+              <input type="number" id="input-width" value="1000" min="100" max="10000" step="10" oninput="calculate()" class="w-full bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-2 text-xs font-mono-num text-white focus:outline-none focus:border-orange-500">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-zinc-300 mb-1">Višina odprtine (H) [mm]</label>
+              <input type="number" id="input-height" value="1600" min="100" max="10000" step="10" oninput="calculate()" class="w-full bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-2 text-xs font-mono-num text-white focus:outline-none focus:border-orange-500">
+            </div>
+          </div>
+        </div>
+
+        <!-- Light Curtain Parameters -->
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 shadow-lg space-y-4">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            2. Svetlobna zavesa
+          </h2>
+
+          <div>
+            <label class="block text-xs font-medium text-zinc-300 mb-1">Ločljivost zavese (d) [mm]</label>
+            <select id="input-resolution" onchange="calculate()" class="w-full bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
+              <option value="14" selected>14 mm — Zaščita prstov (Finger protection)</option>
+              <option value="30">30 mm — Zaščita dlani / roke (Hand protection)</option>
+              <option value="40">40 mm — Zaščita roke (Arm protection)</option>
+              <option value="70">70 mm — Zaščita telesa / večžarkovna (Body protection)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-zinc-300 mb-1">Odzivni čas zavese (t<sub>zavesa</sub>) [ms]</label>
+            <input type="number" id="input-t-curtain" value="15" min="1" max="500" oninput="calculate()" class="w-full bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-2 text-xs font-mono-num text-white focus:outline-none focus:border-cyan-500">
+          </div>
+        </div>
+
+        <!-- Machine / Robot Stopping Parameters -->
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 shadow-lg space-y-4">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            3. Časi ustavljanja pogonov in krmiljenja
+          </h2>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-medium text-zinc-300 mb-1">Čas zavor stroja (t<sub>stroj</sub>) [ms]</label>
+              <input type="number" id="input-t-machine" value="150" min="0" max="5000" step="5" oninput="calculate()" class="w-full bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-2 text-xs font-mono-num text-white focus:outline-none focus:border-emerald-500">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-zinc-300 mb-1">Varnostni rele (t<sub>rele</sub>) [ms]</label>
+              <input type="number" id="input-t-relay" value="10" min="0" max="200" step="1" oninput="calculate()" class="w-full bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-2 text-xs font-mono-num text-white focus:outline-none focus:border-emerald-500">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-zinc-300 mb-1">Varnostna rezerva / obraba zavor (t<sub>rezerva</sub>) [ms]</label>
+            <input type="number" id="input-t-wear" value="20" min="0" max="500" step="5" oninput="calculate()" class="w-full bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-2 text-xs font-mono-num text-white focus:outline-none focus:border-emerald-500">
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN: DIAGRAM & BREAKDOWN & REPORT (7 cols) -->
+      <div class="lg:col-span-7 space-y-5">
+        
+        <!-- VISUAL DIAGRAM -->
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 shadow-lg space-y-3">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-2">
+              <svg class="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12H4z"/></svg>
+              Shematičen prikaz varnostne cone
+            </h2>
+            <span class="text-[11px] text-zinc-400 font-medium">Stranski prerez celice</span>
+          </div>
+
+          <!-- Dynamic SVG Diagram -->
+          <div class="w-full bg-zinc-950 rounded-lg p-4 border border-zinc-800 flex justify-center items-center overflow-hidden">
+            <svg id="safety-svg" viewBox="0 0 600 240" class="w-full h-auto max-h-[260px]">
+              <defs>
+                <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                  <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#27272a" stroke-width="0.5"/>
+                </pattern>
+              </defs>
+              <rect width="600" height="240" fill="url(#grid)" />
+
+              <!-- Ground Line -->
+              <line x1="20" y1="200" x2="580" y2="200" stroke="#52525b" stroke-width="2" stroke-dasharray="4 4" />
+
+              <!-- Hazard Zone -->
+              <rect x="50" y="50" width="120" height="150" fill="#f97316" fill-opacity="0.12" stroke="#f97316" stroke-width="1.5" stroke-dasharray="3 3" />
+              <text x="110" y="120" font-size="11" fill="#f97316" font-weight="700" text-anchor="middle" font-family="Plus Jakarta Sans">NEVARNOST</text>
+              <text x="110" y="136" font-size="9" fill="#a1a1aa" text-anchor="middle" font-family="Plus Jakarta Sans">(Robot / Pogon)</text>
+
+              <!-- Safety Light Curtain -->
+              <line id="svg-curtain-line" x1="340" y1="40" x2="340" y2="200" stroke="#06b6d4" stroke-width="4" />
+              <!-- Beams -->
+              <g stroke="#06b6d4" stroke-width="1" stroke-opacity="0.35" stroke-dasharray="2 2">
+                <line x1="340" y1="60" x2="50" y2="60" />
+                <line x1="340" y1="90" x2="50" y2="90" />
+                <line x1="340" y1="120" x2="50" y2="120" />
+                <line x1="340" y1="150" x2="50" y2="150" />
+                <line x1="340" y1="180" x2="50" y2="180" />
+              </g>
+              <text x="340" y="28" font-size="10" fill="#06b6d4" font-weight="700" text-anchor="middle" font-family="Plus Jakarta Sans">Svetlobna zavesa</text>
+
+              <!-- Dimension S Line -->
+              <g>
+                <line x1="170" y1="175" x2="340" y2="175" stroke="#f97316" stroke-width="1.5" />
+                <polygon points="170,175 178,171 178,179" fill="#f97316" />
+                <polygon points="340,175 332,171 332,179" fill="#f97316" />
+                <rect x="215" y="160" width="80" height="20" fill="#18181b" rx="4" stroke="#f97316" stroke-width="1"/>
+                <text id="svg-s-text" x="255" y="174" font-size="11" fill="#f97316" font-weight="700" font-family="JetBrains Mono" text-anchor="middle">S = 420 mm</text>
+              </g>
+
+              <!-- Human Approach Vector -->
+              <g>
+                <circle cx="460" cy="90" r="10" fill="#e4e4e7" />
+                <line x1="460" y1="100" x2="460" y2="150" stroke="#e4e4e7" stroke-width="3" />
+                <line x1="460" y1="115" x2="430" y2="135" stroke="#e4e4e7" stroke-width="2.5" />
+                <line x1="460" y1="115" x2="490" y2="135" stroke="#e4e4e7" stroke-width="2.5" />
+                <line x1="460" y1="150" x2="445" y2="200" stroke="#e4e4e7" stroke-width="2.5" />
+                <line x1="460" y1="150" x2="475" y2="200" stroke="#e4e4e7" stroke-width="2.5" />
+                
+                <line x1="420" y1="120" x2="360" y2="120" stroke="#10b981" stroke-width="2" stroke-dasharray="3 2"/>
+                <polygon points="360,120 368,116 368,124" fill="#10b981" />
+                <text id="svg-k-text" x="400" y="112" font-size="10" fill="#10b981" font-weight="700" text-anchor="middle" font-family="Plus Jakarta Sans">K = 2000 mm/s</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <!-- MATHEMATICAL BREAKDOWN & ISO RULES -->
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 shadow-lg space-y-3">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-2">
+            <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+            Razčlenitev preračuna po ISO 13855
+          </h2>
+
+          <div class="bg-zinc-950 p-4 rounded-lg border border-zinc-800 space-y-2.5 text-xs text-zinc-300 font-mono-num">
+            <div class="flex justify-between border-b border-zinc-800/80 pb-2 font-sans">
+              <span class="text-zinc-400 font-medium">Osnovna formula:</span>
+              <span class="text-orange-400 font-bold font-mono-num">S = (K × T) + C</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Skupni čas ustavljanja (T):</span>
+              <span><span id="calc-t-sum">15 + 150 + 10 + 20</span> = <strong id="calc-t-total" class="text-cyan-400">195 ms</strong> (<span id="calc-t-sec">0.195</span> s)</span>
+            </div>
+            <div class="flex justify-between">
+              <span>Dodatek vstopa (C):</span>
+              <span>8 × (<span id="calc-d-val">14</span> - 14) = <strong id="calc-c-res" class="text-purple-400">0 mm</strong></span>
+            </div>
+            <div class="flex justify-between">
+              <span>Izračunana razdalja (S):</span>
+              <span>(<span id="calc-k-val">2000</span> × <span id="calc-t-sec2">0.195</span>) + <span id="calc-c-val">0</span> = <strong id="calc-s-raw" class="text-zinc-100">390 mm</strong></span>
+            </div>
+            <div class="border-t border-zinc-800/80 pt-2.5 text-[11px] text-zinc-400 font-sans leading-relaxed" id="calc-notes-box">
+              <!-- Dynamic ISO Note -->
+            </div>
+          </div>
+        </div>
+
+        <!-- REPORT EXPORT BOX -->
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 shadow-lg space-y-3">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-2">
+              <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+              Tehnični povzetek za ponudbo
+            </h2>
+            <div class="flex items-center gap-2">
+              <button onclick="copyReport()" class="px-3 py-1.5 bg-orange-600 hover:bg-orange-500 text-white rounded-md text-xs font-semibold transition flex items-center gap-1 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                <span>Kopiraj tekst</span>
+              </button>
+              <button onclick="exportCSV()" class="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 rounded-md text-xs font-semibold transition flex items-center gap-1 shadow-sm">
+                <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <span>Izvozi CSV</span>
+              </button>
+            </div>
+          </div>
+
+          <textarea id="report-text" readonly class="w-full h-36 bg-zinc-950 border border-zinc-800 rounded-lg p-3 text-xs font-mono-num text-zinc-300 focus:outline-none resize-none leading-relaxed"></textarea>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-5 right-5 bg-orange-600 text-white px-4 py-2.5 rounded-lg shadow-xl text-xs font-semibold translate-y-20 opacity-0 transition-all duration-300">
+    Besedilo kopirano v odložišče!
+  </div>
+
+  <script>
+    function calculate() {
+      const W = parseFloat(document.getElementById('input-width').value) || 0;
+      const H = parseFloat(document.getElementById('input-height').value) || 0;
+      const d = parseInt(document.getElementById('input-resolution').value) || 14;
+      
+      const tCurtain = parseFloat(document.getElementById('input-t-curtain').value) || 0;
+      const tMachine = parseFloat(document.getElementById('input-t-machine').value) || 0;
+      const tRelay = parseFloat(document.getElementById('input-t-relay').value) || 0;
+      const tWear = parseFloat(document.getElementById('input-t-wear').value) || 0;
+
+      const totalT_ms = tCurtain + tMachine + tRelay + tWear;
+      const totalT_s = totalT_ms / 1000.0;
+
+      let C = 0;
+      if (d <= 40) {
+        C = 8 * (d - 14);
+        if (C < 0) C = 0;
+      } else {
+        C = 850;
+      }
+
+      let K = 2000;
+      let S = (K * totalT_s) + C;
+      let kNote = "Uporabljena hitrost K = 2000 mm/s (za S ≤ 500 mm).";
+
+      if (S > 500) {
+        let S_1600 = (1600 * totalT_s) + C;
+        if (S_1600 >= 500) {
+          S = S_1600;
+          K = 1600;
+          kNote = "Ker je varnostna razdalja večja od 500 mm, se po ISO 13855 uporablja zmanjšana hitrost K = 1600 mm/s.";
+        } else {
+          S = 500;
+          K = 2000;
+          kNote = "Preračun s K = 1600 mm/s pade pod 500 mm, zato velja meja S = 500 mm.";
+        }
+      }
+
+      if (S < 100) {
+        S = 100;
+        kNote += " Upoštevana je minimalna dovoljena mejna razdalja po standardu (min 100 mm).";
+      }
+
+      const finalS = Math.round(S);
+      const finalS_cm = (finalS / 10.0).toFixed(1);
+
+      const area_m2 = ((W * H) / 1000000.0).toFixed(2);
+      const diag_mm = Math.round(Math.sqrt(W * W + H * H));
+
+      document.getElementById('kpi-s-mm').textContent = finalS;
+      document.getElementById('kpi-s-cm').textContent = finalS_cm;
+      document.getElementById('kpi-t-ms').textContent = totalT_ms;
+      document.getElementById('kpi-t-sec').textContent = totalT_s.toFixed(3);
+      document.getElementById('kpi-k-val').textContent = K;
+      document.getElementById('kpi-c-val').textContent = C;
+      document.getElementById('kpi-k-note').textContent = kNote;
+
+      document.getElementById('kpi-opening-dim').textContent = `${W} × ${H}`;
+      document.getElementById('kpi-opening-area').textContent = area_m2;
+      document.getElementById('kpi-opening-diag').textContent = diag_mm;
+
+      document.getElementById('calc-t-sum').textContent = `${tCurtain} + ${tMachine} + ${tRelay} + ${tWear}`;
+      document.getElementById('calc-t-total').textContent = `${totalT_ms} ms`;
+      document.getElementById('calc-t-sec').textContent = totalT_s.toFixed(3);
+      document.getElementById('calc-t-sec2').textContent = totalT_s.toFixed(3);
+      document.getElementById('calc-d-val').textContent = d;
+      document.getElementById('calc-c-res').textContent = `${C} mm`;
+      document.getElementById('calc-k-val').textContent = K;
+      document.getElementById('calc-c-val').textContent = C;
+      document.getElementById('calc-s-raw').textContent = `${finalS} mm`;
+
+      const notesBox = document.getElementById('calc-notes-box');
+      notesBox.innerHTML = `
+        <p>• <strong>Opomba po ISO 13855:</strong> ${kNote}</p>
+        <p>• <strong>Priporočilo za svetlobno zaveso:</strong> Za odprtino višine ${H} mm izberite zaveso z varovalno višino vsaj <strong>${H} mm</strong> (št. optičnih žarkov cca. ${Math.ceil(H / d)}).</p>
+      `;
+
+      document.getElementById('svg-s-text').textContent = `S = ${finalS} mm`;
+      document.getElementById('svg-k-text').textContent = `K = ${K} mm/s`;
+
+      updateReport(finalS, finalS_cm, totalT_ms, totalT_s, K, C, d, W, H, area_m2, tCurtain, tMachine, tRelay, tWear, kNote);
+    }
+
+    function applyPreset(type) {
+      if (type === 'robot') {
+        document.getElementById('input-resolution').value = "14";
+        document.getElementById('input-t-curtain').value = "15";
+        document.getElementById('input-t-machine').value = "150";
+        document.getElementById('input-t-relay').value = "10";
+        document.getElementById('input-t-wear').value = "20";
+      } else if (type === 'cylinder') {
+        document.getElementById('input-resolution').value = "30";
+        document.getElementById('input-t-curtain').value = "10";
+        document.getElementById('input-t-machine').value = "80";
+        document.getElementById('input-t-relay').value = "10";
+        document.getElementById('input-t-wear').value = "15";
+      } else if (type === 'press') {
+        document.getElementById('input-resolution').value = "14";
+        document.getElementById('input-t-curtain').value = "20";
+        document.getElementById('input-t-machine').value = "260";
+        document.getElementById('input-t-relay').value = "15";
+        document.getElementById('input-t-wear').value = "40";
+      }
+      calculate();
+    }
+
+    function updateReport(S, S_cm, totalT_ms, totalT_s, K, C, d, W, H, area, tCurtain, tMachine, tRelay, tWear, kNote) {
+      const areaText = document.getElementById('report-text');
+      let txt = `==================================================\n`;
+      txt += ` IZRAČUN VARNOSTNE RAZDALJE (SIST EN ISO 13855)\n`;
+      txt += `==================================================\n`;
+      txt += `• MINIMALNA VARNOSTNA RAZDALJA (S): ${S} mm (${S_cm} cm)\n`;
+      txt += `--------------------------------------------------\n`;
+      txt += `PARAMETRI ODPRTINE IN ZAVESE:\n`;
+      txt += `• Dimenzije odprtine (W x H) : ${W} x ${H} mm (Površina: ${area} m²)\n`;
+      txt += `• Ločljivost zavese (d)     : ${d} mm\n`;
+      txt += `• Dodatek vstopa (C)        : ${C} mm\n`;
+      txt += `• Hitrost približevanja (K) : ${K} mm/s\n`;
+      txt += `--------------------------------------------------\n`;
+      txt += `ANALIZA ODZIVNIH ČASOV (T = ${totalT_ms} ms / ${totalT_s.toFixed(3)} s):\n`;
+      txt += ` 1. Odziv zavese (t_zavesa) : ${tCurtain} ms\n`;
+      txt += ` 2. Ustavljanje stroja      : ${tMachine} ms\n`;
+      txt += ` 3. Varnostni rele / krmilnik: ${tRelay} ms\n`;
+      txt += ` 4. Rezerva / obraba zavor  : ${tWear} ms\n`;
+      txt += `--------------------------------------------------\n`;
+      txt += `OPOMBA STANDARDA:\n`;
+      txt += ` ${kNote}\n`;
+      txt += `==================================================`;
+
+      areaText.value = txt;
+    }
+
+    function copyReport() {
+      const reportArea = document.getElementById('report-text');
+      reportArea.select();
+      navigator.clipboard.writeText(reportArea.value);
+
+      const toast = document.getElementById('toast');
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 2000);
+    }
+
+    function exportCSV() {
+      const W = document.getElementById('input-width').value;
+      const H = document.getElementById('input-height').value;
+      const d = document.getElementById('input-resolution').value;
+      const S = document.getElementById('kpi-s-mm').textContent;
+      const T = document.getElementById('kpi-t-ms').textContent;
+      const K = document.getElementById('kpi-k-val').textContent;
+      const C = document.getElementById('kpi-c-val').textContent;
+
+      let csv = '\uFEFF';
+      csv += 'Parameter;Vrednost;Enota\n';
+      csv += `Varnostna razdalja (S);${S};mm\n`;
+      csv += `Skupni cas ustavljanja (T);${T};ms\n`;
+      csv += `Hitrost priblizevanja (K);${K};mm/s\n`;
+      csv += `Faktor vstopa (C);${C};mm\n`;
+      csv += `Locljivost zavese (d);${d};mm\n`;
+      csv += `Sirina odprtine (W);${W};mm\n`;
+      csv += `Visina odprtine (H);${H};mm\n`;
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.setAttribute('download', `ISO13855_Varnostna_Razdalja_${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    calculate();
+  </script>
+</body>
+</html>
