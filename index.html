@@ -24,145 +24,296 @@ svg text{font-family:'Plus Jakarta Sans',sans-serif}
 </head>
 <body class="bg-zinc-950 text-zinc-100 min-h-screen p-4 md:p-7 antialiased">
 <div class="max-w-[1500px] mx-auto space-y-5">
-
-<header class="card p-5 md:p-6">
+<header class="card p-5 md:p-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
   <div class="flex items-start gap-4">
     <div class="w-12 h-12 rounded-2xl bg-orange-500/10 border border-orange-500/20 text-orange-400 flex items-center justify-center shrink-0">
       <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M9 3h6m-8 3h10M6 8h12l2 13H4L6 8Zm3 4v5m6-5v5"/></svg>
     </div>
     <div>
       <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight">Kalkulator varnostnih razdalj</h1>
-      <p class="text-xs md:text-sm text-zinc-400 mt-1">Določitev potrebne razdalje svetlobnih zaves, ograj in odprtin od nevarnega območja.</p>
-      <div class="flex flex-wrap gap-2 mt-3"><span class="badge">ISO 13855 · svetlobne zavese</span><span class="badge">ISO 13857:2019 · fizične zaščite</span></div>
+      <p class="text-xs md:text-sm text-zinc-400 mt-1">Strokovno orodje za določanje varnostnih razdalj svetlobnih zaves, preprek, odprtin in transporterjev.</p>
     </div>
   </div>
 </header>
 
 <nav class="grid grid-cols-2 md:grid-cols-4 gap-2">
-<button class="tab active rounded-xl p-3 text-left" data-tab="zavesa" onclick="showTab('zavesa')"><div class="text-lg">▥</div><div class="font-extrabold text-xs mt-1">Zavesa</div><div class="text-[10px] opacity-70">ISO 13855</div></button>
-<button class="tab rounded-xl p-3 text-left" data-tab="muting" onclick="showTab('muting')"><div class="text-lg">⇄</div><div class="font-extrabold text-xs mt-1">Muting</div><div class="text-[10px] opacity-70">prehodi materiala</div></button>
-<button class="tab rounded-xl p-3 text-left" data-tab="odprtine" onclick="showTab('odprtine')"><div class="text-lg">□</div><div class="font-extrabold text-xs mt-1">Odprtine ograje</div><div class="text-[10px] opacity-70">ISO 13857</div></button>
+<button class="tab active rounded-xl p-3 text-left" data-tab="zavesa" onclick="showTab('zavesa')"><div class="text-lg">▥</div><div class="font-extrabold text-xs mt-1">Svetlobna zavesa</div><div class="text-[10px] opacity-70">optična zaščita</div></button>
+<button class="tab rounded-xl p-3 text-left" data-tab="muting" onclick="showTab('muting')"><div class="text-lg">⇄</div><div class="font-extrabold text-xs mt-1">Muting sistemi</div><div class="text-[10px] opacity-70">prehodi materiala</div></button>
+<button class="tab rounded-xl p-3 text-left" data-tab="odprtine" onclick="showTab('odprtine')"><div class="text-lg">□</div><div class="font-extrabold text-xs mt-1">Odprtine in ograje</div><div class="text-[10px] opacity-70">mehanske odprtine</div></button>
 <button class="tab rounded-xl p-3 text-left" data-tab="tunel" onclick="showTab('tunel')"><div class="text-lg">▱</div><div class="font-extrabold text-xs mt-1">Tunel / transporter</div><div class="text-[10px] opacity-70">odprtina → nevarnost</div></button>
 </nav>
-
-<section class="card p-5">
-  <h2 class="section-title mb-4">Trenutni rezultati</h2>
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-    <div class="rounded-xl bg-zinc-950 border border-orange-500/30 p-4"><div class="small text-zinc-400">Zavesa · S</div><div class="mt-1"><span id="sum-s" class="result text-3xl text-orange-400">—</span> <span class="small">mm</span></div><div id="sum-s-note" class="small text-zinc-500 mt-1">Izpolni zavihek Zavesa.</div></div>
-    <div class="rounded-xl bg-zinc-950 border border-purple-500/30 p-4"><div class="small text-zinc-400">Odprtina · Sr</div><div class="mt-1"><span id="sum-sr" class="result text-3xl text-purple-400">—</span> <span class="small">mm</span></div><div id="sum-sr-note" class="small text-zinc-500 mt-1">Izpolni zavihek Odprtine ograje.</div></div>
-    <div class="rounded-xl bg-zinc-950 border border-emerald-500/30 p-4"><div class="small text-zinc-400">Tunel · L</div><div class="mt-1"><span id="sum-l" class="result text-3xl text-emerald-400">—</span> <span class="small">mm</span></div><div id="sum-l-note" class="small text-zinc-500 mt-1">Izpolni zavihek Tunel.</div></div>
-    <div class="rounded-xl bg-zinc-950 border border-cyan-500/30 p-4"><div class="small text-zinc-400">Čas ustavitve · T</div><div class="mt-1"><span id="sum-t" class="result text-3xl text-cyan-400">—</span> <span class="small">s</span></div><div id="sum-t-note" class="small text-zinc-500 mt-1">Robot / pnevmatika.</div></div>
-  </div>
-</section>
 
 <section id="tab-zavesa" class="space-y-5">
 <div class="grid grid-cols-1 xl:grid-cols-12 gap-5">
 <div class="space-y-5 xl:col-span-5">
-<div class="card p-5"><div class="flex items-center justify-between"><div><h2 class="section-title text-orange-300">1. Nevarna naprava</h2><p class="text-sm font-bold mt-1">Izberi tip pogona za prednastavitev časa.</p></div><span class="badge">ISO 13855</span></div>
-<div class="grid grid-cols-2 gap-3 mt-4"><button id="drive-robot" class="drive-btn rounded-xl p-4 border border-orange-500/50 bg-orange-500/10" onclick="setDrive('robot')"><div class="text-xl">🤖</div><div class="font-extrabold text-sm mt-1">Robot</div><div class="text-[10px] text-zinc-400">primer 0,150 s</div></button><button id="drive-pneu" class="drive-btn rounded-xl p-4 border border-zinc-700 bg-zinc-950" onclick="setDrive('pneu')"><div class="text-xl">↔</div><div class="font-extrabold text-sm mt-1">Pnevmatika</div><div class="text-[10px] text-zinc-400">primer 0,080 s</div></button></div>
-<div class="mt-4"><label class="label">Način vnosa časa ustavitve</label><select id="z-time-mode" class="select" onchange="calcZavesa()"><option value="preset">Prednastavljen orientacijski čas</option><option value="manual">Moj dejanski / izmerjeni čas</option></select></div>
-<div class="grid grid-cols-2 gap-3 mt-3"><div><label class="label">Čas stroja / robota [s]</label><input id="z-machine" class="input" type="number" value="0.150" min="0" step="0.001" oninput="calcZavesa()"><div class="help">Vnesi dejanski ali izmerjeni čas ustavitve konkretnega sistema.</div></div><div><label class="label">Čas varnostnega releja/krmilja [s]</label><input id="z-relay" class="input" type="number" value="0.010" min="0" step="0.001" oninput="calcZavesa()"></div></div>
-<div class="grid grid-cols-2 gap-3 mt-3"><div><label class="label">Odzivni čas zavese [s]</label><input id="z-curtain" class="input" type="number" value="0.015" min="0" step="0.001" oninput="calcZavesa()"></div><div><label class="label">Rezerva / obraba [s]</label><input id="z-wear" class="input" type="number" value="0.020" min="0" step="0.001" oninput="calcZavesa()"></div></div>
+<div class="card p-5">
+<div class="flex items-center justify-between">
+  <div><h2 class="section-title text-orange-300">1. Nevarna naprava in časi</h2><p class="text-sm font-bold mt-1">Izberi tip pogona ali ročno vnesi čase.</p></div>
 </div>
-<div class="card p-5"><h2 class="section-title text-orange-300">2. Svetlobna zavesa</h2><div class="mt-4"><label class="label">Ločljivost d [mm]</label><select id="z-resolution" class="select" onchange="calcZavesa()"><option value="14">14 mm – zaščita prstov</option><option value="30">30 mm – zaščita dlani</option><option value="40">40 mm – zaščita roke</option><option value="50">50 mm</option><option value="70">70 mm – večžarkovna / telo</option></select></div><div class="mt-3"><label class="label">K – hitrost približevanja [mm/s]</label><select id="z-k" class="select" onchange="calcZavesa()"><option value="2000">2000 mm/s – standardna vrednost</option><option value="1600">1600 mm/s – pri ustreznem primeru po ISO 13855</option></select><div class="help">K ni lastnost robota; odvisen je od načina pristopa in uporabe zaščitne naprave.</div></div></div>
+<div class="grid grid-cols-2 gap-3 mt-4">
+  <button id="drive-robot" class="drive-btn rounded-xl p-4 border border-orange-500/50 bg-orange-500/10 text-left" onclick="setDrive('robot')"><div class="text-xl">🤖</div><div class="font-extrabold text-sm mt-1">Robot</div><div class="text-[10px] text-zinc-400">primer 0,150 s</div></button>
+  <button id="drive-pneu" class="drive-btn rounded-xl p-4 border border-zinc-700 bg-zinc-950 text-left" onclick="setDrive('pneu')"><div class="text-xl">↔</div><div class="font-extrabold text-sm mt-1">Pnevmatika</div><div class="text-[10px] text-zinc-400">primer 0,080 s</div></button>
+</div>
+<div class="mt-4"><label class="label">Način vnosa časa ustavitve</label><select id="z-time-mode" class="select" onchange="calcZavesa()"><option value="preset">Prednastavljen orientacijski čas</option><option value="manual">Dejanski / izmerjeni čas</option></select></div>
+<div class="grid grid-cols-2 gap-3 mt-3">
+  <div><label class="label">Čas stroja / robota [s]</label><input id="z-machine" class="input" type="number" value="0.150" min="0" step="0.001" oninput="calcZavesa()"></div>
+  <div><label class="label">Čas varnostnega releja [s]</label><input id="z-relay" class="input" type="number" value="0.010" min="0" step="0.001" oninput="calcZavesa()"></div>
+</div>
+<div class="grid grid-cols-2 gap-3 mt-3">
+  <div><label class="label">Odzivni čas zavese [s]</label><input id="z-curtain" class="input" type="number" value="0.015" min="0" step="0.001" oninput="calcZavesa()"></div>
+  <div><label class="label">Rezerva / obraba [s]</label><input id="z-wear" class="input" type="number" value="0.020" min="0" step="0.001" oninput="calcZavesa()"></div>
+</div>
+</div>
+<div class="card p-5">
+<h2 class="section-title text-orange-300">2. Ločljivost in hitrost</h2>
+<div class="mt-4"><label class="label">Ločljivost d [mm]</label><select id="z-resolution" class="select" onchange="calcZavesa()"><option value="14">14 mm – zaščita prstov</option><option value="30">30 mm – zaščita dlani</option><option value="40">40 mm – zaščita roke</option><option value="50">50 mm</option><option value="70">70 mm – večžarkovna / telo</option></select></div>
+<div class="mt-3"><label class="label">K – hitrost približevanja [mm/s]</label><select id="z-k" class="select" onchange="calcZavesa()"><option value="2000">2000 mm/s – standardna vrednost</option><option value="1600">1600 mm/s – pri ustreznem primeru</option></select></div>
+</div>
 </div>
 <div class="xl:col-span-7 space-y-5">
-<div class="card p-5"><div class="flex justify-between items-start"><div><h2 class="section-title">Rezultat izračuna</h2><p class="text-sm text-zinc-400 mt-1">Razdalja od nevarnega območja do detekcijske ravnine.</p></div><span id="z-status" class="badge warn">—</span></div>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5"><div class="rounded-xl bg-zinc-950 border border-orange-500/30 p-4"><div class="small text-zinc-400">Skupni čas T</div><div><span id="z-total" class="result text-3xl text-cyan-400">0.000</span> <span>s</span></div></div><div class="rounded-xl bg-zinc-950 border border-orange-500/30 p-4"><div class="small text-zinc-400">Dodatek C</div><div><span id="z-c" class="result text-3xl text-zinc-100">0</span> <span>mm</span></div></div><div class="rounded-xl bg-orange-500/10 border border-orange-500/40 p-4"><div class="small text-orange-200">MIN. RAZDALJA S</div><div><span id="z-s" class="result text-4xl text-orange-400">0</span> <span>mm</span></div></div></div>
-<div class="mt-5 rounded-xl border border-zinc-800 bg-zinc-950 p-4 mono text-xs"><div>S = (K × T) + C</div><div class="mt-2 text-zinc-300"><span id="z-formula">(2000 × 0,195) + 0</span> = <strong id="z-formula-result" class="text-orange-400">390 mm</strong></div></div>
-<div class="mt-4 p-3 rounded-xl bg-yellow-500/5 border border-yellow-500/20 text-xs text-yellow-100/80">Za končni preračun varnostne razdalje uporabi podatke proizvajalca konkretne zavese in dejanski izmerjeni čas ustavitve celotnega zaščitenega sistema.</div></div>
-<div class="card p-5"><h2 class="section-title">Uporaba rezultata</h2><div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs"><div class="rounded-xl bg-zinc-950 p-4 border border-zinc-800"><div class="text-zinc-500">Zapiši kot</div><div class="font-bold mt-1">S ≥ <span id="z-drawing" class="text-orange-400">—</span> mm</div></div><div class="rounded-xl bg-zinc-950 p-4 border border-zinc-800"><div class="text-zinc-500">Merilna točka</div><div class="font-bold mt-1">od ravnine svetlobne zavese do najbližje nevarnosti</div></div></div></div>
+<div class="card p-5">
+<div class="flex justify-between items-start">
+  <div><h2 class="section-title">Izračunana varnostna razdalja</h2><p class="text-sm text-zinc-400 mt-1">Minimalna oddaljenost detekcijske ravnine od nevarnega območja.</p></div>
+  <span id="z-status" class="badge warn">—</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
+  <div class="rounded-xl bg-zinc-950 border border-orange-500/30 p-4"><div class="small text-zinc-400">Skupni čas T</div><div><span id="z-total" class="result text-3xl text-cyan-400">0.000</span> <span>s</span></div></div>
+  <div class="rounded-xl bg-zinc-950 border border-orange-500/30 p-4"><div class="small text-zinc-400">Dodatek C</div><div><span id="z-c" class="result text-3xl text-zinc-100">0</span> <span>mm</span></div></div>
+  <div class="rounded-xl bg-orange-500/10 border border-orange-500/40 p-4"><div class="small text-orange-200">MIN. RAZDALJA S</div><div><span id="z-s" class="result text-4xl text-orange-400">0</span> <span>mm</span></div></div>
+</div>
+<div class="mt-5 rounded-xl border border-zinc-800 bg-zinc-950 p-4 mono text-xs">
+  <div>Formula: S = (K × T) + C</div>
+  <div class="mt-2 text-zinc-300"><span id="z-formula">(2000 × 0,195) + 0</span> = <strong id="z-formula-result" class="text-orange-400">390 mm</strong></div>
+</div>
+</div>
+<div class="card p-5">
+<h2 class="section-title">Uporaba v načrtu</h2>
+<div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+  <div class="rounded-xl bg-zinc-950 p-4 border border-zinc-800"><div class="text-zinc-500">Zahtevana razdalja</div><div class="font-bold text-sm mt-1">S ≥ <span id="z-drawing" class="text-orange-400">—</span> mm</div></div>
+  <div class="rounded-xl bg-zinc-950 p-4 border border-zinc-800"><div class="text-zinc-500">Merilna točka</div><div class="font-bold text-sm mt-1">od ravnine zavese do najbližje nevarnosti</div></div>
+</div>
+</div>
 </div></div>
 </section>
 
 <section id="tab-muting" class="hidden space-y-5">
 <div class="grid grid-cols-1 xl:grid-cols-12 gap-5">
 <div class="xl:col-span-5 space-y-5">
-<div class="card p-5"><div class="flex justify-between"><div><h2 class="section-title text-blue-300">Muting + svetlobna zavesa</h2><p class="text-sm font-bold mt-1">Razdalja do nevarnosti in osnovna kontrola položaja muting tipal.</p></div><span class="badge">ISO 13855 + muting</span></div>
-<div class="grid grid-cols-2 gap-2 mt-4"><button id="m-drive-robot" class="m-drive rounded-xl p-3 border border-orange-500/40 bg-orange-500/10 text-left" onclick="setMutingDrive('robot')"><div class="font-extrabold text-sm">Robot</div><div class="text-[10px] text-zinc-400">orientacijska prednastavitev</div></button><button id="m-drive-pneu" class="m-drive rounded-xl p-3 border border-zinc-700 bg-zinc-950 text-left" onclick="setMutingDrive('pneu')"><div class="font-extrabold text-sm">Pnevmatika</div><div class="text-[10px] text-zinc-400">orientacijska prednastavitev</div></button></div>
-<div class="grid grid-cols-2 gap-3 mt-3"><div><label class="label">Čas ustavitve nevarnosti [s]</label><input id="m-stop" class="input" type="number" value="0.150" min="0" step="0.001" oninput="calcMuting()"></div><div><label class="label">Odzivni čas zavese [s]</label><input id="m-curtain" class="input" type="number" value="0.015" min="0" step="0.001" oninput="calcMuting()"></div></div>
-<div class="grid grid-cols-2 gap-3 mt-3"><div><label class="label">Odzivni čas varnostnega krmilja [s]</label><input id="m-control" class="input" type="number" value="0.010" min="0" step="0.001" oninput="calcMuting()"></div><div><label class="label">Varnostna rezerva [s]</label><input id="m-reserve" class="input" type="number" value="0.020" min="0" step="0.001" oninput="calcMuting()"></div></div>
+<div class="card p-5">
+<div class="flex justify-between">
+  <div><h2 class="section-title text-blue-300">1. Muting parametri</h2><p class="text-sm font-bold mt-1">Časi in nastavitve premostitve zavese.</p></div>
+</div>
+<div class="grid grid-cols-2 gap-2 mt-4">
+  <button id="m-drive-robot" class="m-drive rounded-xl p-3 border border-orange-500/40 bg-orange-500/10 text-left" onclick="setMutingDrive('robot')"><div class="font-extrabold text-sm">Robot</div><div class="text-[10px] text-zinc-400">prednastavitev</div></button>
+  <button id="m-drive-pneu" class="m-drive rounded-xl p-3 border border-zinc-700 bg-zinc-950 text-left" onclick="setMutingDrive('pneu')"><div class="font-extrabold text-sm">Pnevmatika</div><div class="text-[10px] text-zinc-400">prednastavitev</div></button>
+</div>
+<div class="grid grid-cols-2 gap-3 mt-3">
+  <div><label class="label">Čas ustavitve nevarnosti [s]</label><input id="m-stop" class="input" type="number" value="0.150" min="0" step="0.001" oninput="calcMuting()"></div>
+  <div><label class="label">Odzivni čas zavese [s]</label><input id="m-curtain" class="input" type="number" value="0.015" min="0" step="0.001" oninput="calcMuting()"></div>
+</div>
+<div class="grid grid-cols-2 gap-3 mt-3">
+  <div><label class="label">Odzivni čas krmilja [s]</label><input id="m-control" class="input" type="number" value="0.010" min="0" step="0.001" oninput="calcMuting()"></div>
+  <div><label class="label">Varnostna rezerva [s]</label><input id="m-reserve" class="input" type="number" value="0.020" min="0" step="0.001" oninput="calcMuting()"></div>
+</div>
 <div class="mt-3"><label class="label">Ločljivost zavese d [mm]</label><select id="m-resolution" class="select" onchange="calcMuting()"><option value="14">14 mm – prsti</option><option value="30">30 mm – dlan</option><option value="40" selected>40 mm – roka</option><option value="50">50 mm</option><option value="55">55 mm</option></select></div>
 </div>
-<div class="card p-5"><h2 class="section-title text-blue-300">Geometrija mutinga</h2>
-<div class="grid grid-cols-2 gap-3 mt-4"><div><label class="label">Hitrost transporterja [m/s]</label><input id="m-speed" class="input" type="number" value="0.30" min="0.001" step="0.01" oninput="calcMuting()"></div><div><label class="label">Razdalja tipalo → zavesa [mm]</label><input id="m-sensor-dist" class="input" type="number" value="150" min="0" step="1" oninput="calcMuting()"></div></div>
-<div class="grid grid-cols-2 gap-3 mt-3"><div><label class="label">Dolžina izdelka [mm]</label><input id="m-product" class="input" type="number" value="300" min="1" oninput="calcMuting()"></div><div><label class="label">Razmak tipal [mm]</label><input id="m-sensor-gap" class="input" type="number" value="200" min="1" oninput="calcMuting()"></div></div>
-<div class="mt-4"><label class="label">Način mutinga</label><div class="grid grid-cols-3 gap-2"><button class="mtype rounded-lg border border-blue-500/40 bg-blue-500/10 p-3 text-xs font-bold" data-m="L" onclick="setMutingType('L')">L-mutiranje</button><button class="mtype rounded-lg border border-zinc-700 bg-zinc-950 p-3 text-xs font-bold" data-m="T" onclick="setMutingType('T')">T-mutiranje</button><button class="mtype rounded-lg border border-zinc-700 bg-zinc-950 p-3 text-xs font-bold" data-m="X" onclick="setMutingType('X')">Križno mutiranje</button></div></div>
+<div class="card p-5">
+<h2 class="section-title text-blue-300">2. Geometrija mutinga</h2>
+<div class="grid grid-cols-2 gap-3 mt-4">
+  <div><label class="label">Hitrost transporterja [m/s]</label><input id="m-speed" class="input" type="number" value="0.30" min="0.001" step="0.01" oninput="calcMuting()"></div>
+  <div><label class="label">Razdalja tipalo → zavesa [mm]</label><input id="m-sensor-dist" class="input" type="number" value="150" min="0" step="1" oninput="calcMuting()"></div>
+</div>
+<div class="grid grid-cols-2 gap-3 mt-3">
+  <div><label class="label">Dolžina izdelka [mm]</label><input id="m-product" class="input" type="number" value="300" min="1" oninput="calcMuting()"></div>
+  <div><label class="label">Razmak tipal [mm]</label><input id="m-sensor-gap" class="input" type="number" value="200" min="1" oninput="calcMuting()"></div>
+</div>
+<div class="mt-4"><label class="label">Način mutinga</label>
+  <div class="grid grid-cols-3 gap-2">
+    <button class="mtype rounded-lg border border-blue-500/40 bg-blue-500/10 p-3 text-xs font-bold" data-m="L" onclick="setMutingType('L')">L-mutiranje</button>
+    <button class="mtype rounded-lg border border-zinc-700 bg-zinc-950 p-3 text-xs font-bold" data-m="T" onclick="setMutingType('T')">T-mutiranje</button>
+    <button class="mtype rounded-lg border border-zinc-700 bg-zinc-950 p-3 text-xs font-bold" data-m="X" onclick="setMutingType('X')">Križno</button>
+  </div>
+</div>
 </div>
 </div>
 <div class="xl:col-span-7 space-y-5">
-<div class="card p-5"><div class="flex justify-between items-start"><div><h2 class="section-title">Razdalja do nevarnosti</h2><p class="text-sm text-zinc-400 mt-1">To je razdalja, ki jo potrebuješ za postavitev zaščite.</p></div><span id="m-status" class="badge warn">—</span></div>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5"><div class="rounded-xl bg-zinc-950 border border-zinc-800 p-4"><div class="small text-zinc-400">Skupni čas T</div><div><span id="m-total" class="result text-3xl text-cyan-400">0.000</span> <span>s</span></div></div><div class="rounded-xl bg-zinc-950 border border-zinc-800 p-4"><div class="small text-zinc-400">Varnostna razdalja S</div><div><span id="m-s" class="result text-3xl text-orange-400">0</span> <span>mm</span></div></div><div class="rounded-xl bg-blue-500/10 border border-blue-500/40 p-4"><div class="small text-blue-200">MIN. tipalo → zavesa</div><div><span id="m-sensor-min" class="result text-3xl text-blue-300">0</span> <span>mm</span></div></div></div>
-<div class="mt-5 rounded-xl bg-orange-500/10 border border-orange-500/30 p-4"><div class="text-xs text-orange-200">REZULTAT</div><div class="mt-1 text-2xl font-extrabold">Nevarnost ≥ <span id="m-drawing" class="text-orange-400">0</span> mm od ravnine zavese</div><div class="text-xs text-zinc-400 mt-2">Muting ne omogoča samodejnega zmanjšanja varnostne razdalje S do nevarnosti. Ločeno je treba preveriti tudi dovolj velik odmik tipala pred zaveso, da se muting lahko varno aktivira pred prihodom materiala v zaščitno polje.</div></div>
+<div class="card p-5">
+<div class="flex justify-between items-start">
+  <div><h2 class="section-title">Rezultat za muting</h2><p class="text-sm text-zinc-400 mt-1">Preverjanje pravilne postavitve tipal in varnostne razdalje.</p></div>
+  <span id="m-status" class="badge warn">—</span>
 </div>
-<div class="card p-5"><h2 class="section-title">Položaj muting tipala</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4"><div class="rounded-xl bg-zinc-950 border border-zinc-800 p-4"><div class="small text-zinc-400">Čas poti od tipala do zavese</div><div class="result text-2xl mt-1" id="m-arrival-time">0.000 s</div></div><div class="rounded-xl bg-zinc-950 border border-zinc-800 p-4"><div class="small text-zinc-400">Najmanjša razdalja tipalo → zavesa</div><div class="result text-2xl mt-1 text-blue-300" id="m-sensor-rule">0 mm</div></div></div><div id="m-checklist" class="space-y-2 mt-4"></div></div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
+  <div class="rounded-xl bg-zinc-950 border border-zinc-800 p-4"><div class="small text-zinc-400">Skupni čas T</div><div><span id="m-total" class="result text-3xl text-cyan-400">0.000</span> <span>s</span></div></div>
+  <div class="rounded-xl bg-zinc-950 border border-zinc-800 p-4"><div class="small text-zinc-400">Varnostna razdalja S</div><div><span id="m-s" class="result text-3xl text-orange-400">0</span> <span>mm</span></div></div>
+  <div class="rounded-xl bg-blue-500/10 border border-blue-500/40 p-4"><div class="small text-blue-200">MIN. tipalo → zavesa</div><div><span id="m-sensor-min" class="result text-3xl text-blue-300">0</span> <span>mm</span></div></div>
+</div>
+<div class="mt-5 rounded-xl bg-orange-500/10 border border-orange-500/30 p-4">
+  <div class="text-xs text-orange-200">POVZETEK ZA POSTAVITEV</div>
+  <div class="mt-1 text-2xl font-extrabold">Nevarnost ≥ <span id="m-drawing" class="text-orange-400">0</span> mm od ravnine zavese</div>
+  <div class="text-xs text-zinc-400 mt-2">Muting ne zmanjšuje varnostne razdalje do nevarnosti, temveč omogoča varno premostitev med transportom materiala.</div>
+</div>
+</div>
+<div class="card p-5">
+<h2 class="section-title">Primerjava načinov mutinga</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3 text-xs">
+  <div class="bg-zinc-950 p-3 rounded-xl border border-zinc-800">
+    <div class="font-bold text-blue-300">L-mutiranje</div>
+    <div class="text-zinc-400 mt-1">Senzorja sta zaporedno na eni strani zavese. Uporablja se za enosmerne transporte (npr. izhod palet). Zahteva natančno zaporedje proženja.</div>
+  </div>
+  <div class="bg-zinc-950 p-3 rounded-xl border border-zinc-800">
+    <div class="font-bold text-blue-300">T-mutiranje</div>
+    <div class="text-zinc-400 mt-1">Senzorji so simetrično na obeh straneh zavese. Omogoča premostitev pri premikanju materiala v obe smeri (naprej in nazaj).</div>
+  </div>
+  <div class="bg-zinc-950 p-3 rounded-xl border border-zinc-800">
+    <div class="font-bold text-blue-300">Križno (X-muting)</div>
+    <div class="text-zinc-400 mt-1">Senzorji se pred zaveso križajo. Nudi visoko zaščito pred manipulacijo, ker morata oba kanala spremeniti stanje v točno določenem časovnem oknu.</div>
+  </div>
+</div>
+</div>
+<div class="card p-5">
+<h2 class="section-title">Kontrola tipal</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+  <div class="rounded-xl bg-zinc-950 border border-zinc-800 p-4"><div class="small text-zinc-400">Čas poti od tipala do zavese</div><div class="result text-2xl mt-1" id="m-arrival-time">0.000 s</div></div>
+  <div class="rounded-xl bg-zinc-950 border border-zinc-800 p-4"><div class="small text-zinc-400">Najmanjša razdalja tipalo → zavesa</div><div class="result text-2xl mt-1 text-blue-300" id="m-sensor-rule">0 mm</div></div>
+</div>
+<div id="m-checklist" class="space-y-2 mt-4"></div>
+</div>
 </div></div>
 </section>
 
 <section id="tab-odprtine" class="hidden space-y-5">
 <div class="grid grid-cols-1 xl:grid-cols-12 gap-5">
 <div class="xl:col-span-5 space-y-5">
-<div class="card p-5"><div class="flex justify-between"><div><h2 class="section-title text-purple-300">1. Geometrija odprtine</h2><p class="text-sm font-bold mt-1">Vnesi dejanske mere zaščite.</p></div><span class="badge">ISO 13857:2019</span></div>
-<div class="mt-4"><label class="label">Oblika</label><select id="o-shape" class="select" onchange="toggleOpeningInputs();calcOdprtine()"><option value="square">Kvadrat / pravokotnik</option><option value="round">Krog</option><option value="slot">Reža</option></select></div>
-<div class="grid grid-cols-2 gap-3 mt-3"><div><label class="label">Mera A [mm]</label><input id="o-a" class="input" type="number" value="40" min="0.1" oninput="calcOdprtine()"></div><div id="o-b-wrap"><label class="label">Mera B [mm]</label><input id="o-b" class="input" type="number" value="40" min="0.1" oninput="calcOdprtine()"><div class="help">Pri reži je B dolžina reže; pri pravokotni odprtini je širina B.</div></div></div>
-<div class="mt-3"><label class="label">Kje je nevarnost glede na odprtino?</label><select id="o-body" class="select" onchange="calcOdprtine()"><option value="upper">Zgornji udi – oseba ≥14 let</option><option value="lower">Spodnji udi – oseba ≥14 let</option></select></div>
-<div class="mt-3"><label class="label">Dejanska razdalja do nevarnosti [mm]</label><input id="o-actual" class="input" type="number" value="250" min="0" oninput="calcOdprtine()"><div class="help">Preveri se, ali je nevarnost najmanj toliko oddaljena, kot zahteva izbrana tabela.</div></div>
+<div class="card p-5">
+<div class="flex justify-between">
+  <div><h2 class="section-title text-purple-300">1. Geometrija odprtine</h2><p class="text-sm font-bold mt-1">Vnesi dimenzije odprtine v zaščitni pregradi.</p></div>
 </div>
-<div class="card p-5"><h2 class="section-title text-purple-300">2. Posebni primer</h2><label class="flex items-center gap-2 text-xs mt-4"><input id="o-slot-short" type="checkbox" onchange="calcOdprtine()"> Kratka reža, kjer je mogoče upoštevati omejitev s palcem</label><div class="help mt-2">Za režo so lahko pri posebni dolžini uporabljene zmanjšane vrednosti; to se označi samo, kadar je pogoj izpolnjen.</div></div>
+<div class="mt-4"><label class="label">Oblika odprtine</label><select id="o-shape" class="select" onchange="toggleOpeningInputs();calcOdprtine()"><option value="square">Kvadrat / pravokotnik</option><option value="round">Krog</option><option value="slot">Reža</option></select></div>
+<div class="grid grid-cols-2 gap-3 mt-3">
+  <div><label class="label">Mera A [mm]</label><input id="o-a" class="input" type="number" value="40" min="0.1" oninput="calcOdprtine()"></div>
+  <div id="o-b-wrap"><label class="label">Mera B [mm]</label><input id="o-b" class="input" type="number" value="40" min="0.1" oninput="calcOdprtine()"></div>
+</div>
+<div class="mt-3"><label class="label">Dostop delov telesa</label><select id="o-body" class="select" onchange="calcOdprtine()"><option value="upper">Zgornji udi – oseba ≥14 let</option><option value="lower">Spodnji udi – oseba ≥14 let</option></select></div>
+<div class="mt-3"><label class="label">Dejanska razdalja do nevarnosti [mm]</label><input id="o-actual" class="input" type="number" value="250" min="0" oninput="calcOdprtine()"></div>
+</div>
 </div>
 <div class="xl:col-span-7 space-y-5">
-<div class="card p-5"><div class="flex justify-between items-start"><div><h2 class="section-title">Minimalna razdalja do nevarnosti</h2><p id="o-desc" class="text-sm text-zinc-400 mt-1">—</p></div><span id="o-status" class="badge warn">—</span></div>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5"><div class="rounded-xl bg-zinc-950 border border-zinc-800 p-4"><div class="small text-zinc-400">Efektivna odprtina e</div><div><span id="o-e" class="result text-3xl text-purple-400">0</span> <span>mm</span></div></div><div class="rounded-xl bg-zinc-950 border border-zinc-800 p-4"><div class="small text-zinc-400">Dejanska razdalja</div><div><span id="o-actual-out" class="result text-3xl text-zinc-100">0</span> <span>mm</span></div></div><div class="rounded-xl bg-purple-500/10 border border-purple-500/40 p-4"><div class="small text-purple-200">MIN. Sr</div><div><span id="o-sr" class="result text-4xl text-purple-400">0</span> <span>mm</span></div></div></div>
-<div class="mt-5 overflow-hidden rounded-xl border border-zinc-800"><div class="grid-table grid-head"><div>Del telesa</div><div>Odprtina</div><div>Sr min.</div><div>Opomba</div></div><div id="o-table"></div></div>
-<div id="o-warning" class="mt-4 p-3 rounded-xl bg-yellow-500/5 border border-yellow-500/20 text-xs text-yellow-100/80"></div></div>
-<div class="card p-5"><h2 class="section-title">Rezultat</h2><div class="mt-4 rounded-xl bg-zinc-950 border border-purple-500/30 p-5"><div class="text-xs text-zinc-400">Uporabi:</div><div class="mt-2 text-2xl font-extrabold">Nevarnost ≥ <span id="o-drawing" class="text-purple-400 mono">—</span> mm od ravnine odprtine</div><div class="text-xs text-zinc-500 mt-2">Merjeno od najbližje točke odprtine oziroma zaščitne površine do najbližje dostopne nevarnosti.</div></div></div>
+<div class="card p-5">
+<div class="flex justify-between items-start">
+  <div><h2 class="section-title">Minimalna razdalja do nevarnosti</h2><p id="o-desc" class="text-sm text-zinc-400 mt-1">—</p></div>
+  <span id="o-status" class="badge warn">—</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
+  <div class="rounded-xl bg-zinc-950 border border-zinc-800 p-4"><div class="small text-zinc-400">Efektivna odprtina e</div><div><span id="o-e" class="result text-3xl text-purple-400">0</span> <span>mm</span></div></div>
+  <div class="rounded-xl bg-zinc-950 border border-zinc-800 p-4"><div class="small text-zinc-400">Dejanska razdalja</div><div><span id="o-actual-out" class="result text-3xl text-zinc-100">0</span> <span>mm</span></div></div>
+  <div class="rounded-xl bg-purple-500/10 border border-purple-500/40 p-4"><div class="small text-purple-200">MIN. RAZDALJA Sr</div><div><span id="o-sr" class="result text-4xl text-purple-400">0</span> <span>mm</span></div></div>
+</div>
+<div class="mt-5 overflow-hidden rounded-xl border border-zinc-800">
+  <div class="grid-table grid-head"><div>Del telesa</div><div>Odprtina</div><div>Sr min.</div><div>Referenca</div></div>
+  <div id="o-table"></div>
+</div>
+</div>
+<div class="card p-5">
+<h2 class="section-title">Rezultat za postavitev</h2>
+<div class="mt-4 rounded-xl bg-zinc-950 border border-purple-500/30 p-5">
+  <div class="text-xs text-zinc-400">Zahtevana oddaljenost v načrtu:</div>
+  <div class="mt-2 text-2xl font-extrabold">Nevarnost ≥ <span id="o-drawing" class="text-purple-400 mono">—</span> mm od ravnine odprtine</div>
+</div>
+</div>
 </div></div>
 </section>
 
 <section id="tab-tunel" class="hidden space-y-5">
 <div class="grid grid-cols-1 xl:grid-cols-12 gap-5">
 <div class="xl:col-span-5 space-y-5">
-<div class="card p-5"><div class="flex justify-between"><div><h2 class="section-title text-emerald-300">Tunel / transporter</h2><p class="text-sm font-bold mt-1">Vnesi realno odprtino in razdaljo od odprtine do nevarnosti.</p></div><span class="badge">ISO 13857:2019</span></div>
-<div class="mt-4"><label class="label">Oblika odprtine</label><select id="t-shape" class="select" onchange="calcTunel()"><option value="square">Pravokotna / kvadratna</option><option value="round">Okrogla</option><option value="slot">Reža</option></select></div>
-<div class="grid grid-cols-2 gap-3 mt-3"><div><label class="label">Ozka mera e [mm]</label><input id="t-e" class="input" type="number" value="100" min="0.1" oninput="calcTunel()"></div><div><label class="label">Širina odprtine [mm]</label><input id="t-width" class="input" type="number" value="600" min="0.1" oninput="calcTunel()"></div></div>
-<div class="mt-3"><label class="label">Dejanska razdalja odprtina → najbližja nevarnost [mm]</label><input id="t-l-actual" class="input" type="number" value="800" min="0" oninput="calcTunel()"></div>
-<div class="mt-3"><label class="label">Dodatna notranja pregrada / ovira [mm]</label><input id="t-extra" class="input" type="number" value="0" min="0" oninput="calcTunel()"><div class="help">Vnesi samo razdaljo, ki dejansko podaljša najkrajšo pot do nevarnosti. Ne uporabljaj je za umetno zmanjšanje dosega.</div></div>
+<div class="card p-5">
+<div class="flex justify-between">
+  <div><h2 class="section-title text-emerald-300">Tunel / transporter</h2><p class="text-sm font-bold mt-1">Določitev dolžine tunela glede na odprtino.</p></div>
 </div>
-<div class="card p-5"><h2 class="section-title text-emerald-300">Dodatna preverjanja</h2><label class="flex items-start gap-2 text-xs mt-4"><input id="t-sidewalls" type="checkbox" checked onchange="calcTunel()"><span>Bočne stene omejujejo neposreden bočni dostop</span></label><label class="flex items-start gap-2 text-xs mt-3"><input id="t-cover" type="checkbox" onchange="calcTunel()"><span>Obstaja dodatna pregrada, ki fizično omejuje doseg</span></label><div class="help mt-3">Rezultat je namenoma konservativen. Pri kompleksni geometriji ali dosegu pod kotom je potrebna dodatna analiza po ISO 13857.</div></div>
+<div class="mt-4"><label class="label">Oblika odprtine tunela</label><select id="t-shape" class="select" onchange="calcTunel()"><option value="square">Pravokotna / kvadratna</option><option value="round">Okrogla</option><option value="slot">Reža</option></select></div>
+<div class="grid grid-cols-2 gap-3 mt-3">
+  <div><label class="label">Ozka mera e [mm]</label><input id="t-e" class="input" type="number" value="100" min="0.1" oninput="calcTunel()"></div>
+  <div><label class="label">Širina odprtine [mm]</label><input id="t-width" class="input" type="number" value="600" min="0.1" oninput="calcTunel()"></div>
+</div>
+<div class="mt-3"><label class="label">Dejanska razdalja odprtina → nevarnost [mm]</label><input id="t-l-actual" class="input" type="number" value="800" min="0" oninput="calcTunel()"></div>
+<div class="mt-3"><label class="label">Dodatna notranja pregrada [mm]</label><input id="t-extra" class="input" type="number" value="0" min="0" oninput="calcTunel()"></div>
+</div>
 </div>
 <div class="xl:col-span-7 space-y-5">
-<div class="card p-5"><div class="flex justify-between items-start"><div><h2 class="section-title">Rezultat izračuna</h2><p class="text-sm text-zinc-400 mt-1">Minimalna razdalja od ravnine odprtine do nevarnega območja.</p></div><span id="t-status" class="badge warn">—</span></div>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5"><div class="rounded-xl bg-zinc-950 border border-zinc-800 p-4"><div class="small text-zinc-400">Efektivna odprtina e</div><div class="result text-3xl mt-1 text-emerald-400"><span id="t-e-out">0</span> mm</div></div><div class="rounded-xl bg-zinc-950 border border-zinc-800 p-4"><div class="small text-zinc-400">Minimalno potrebno</div><div class="result text-3xl mt-1 text-emerald-400"><span id="t-required">0</span> mm</div></div><div class="rounded-xl bg-zinc-950 border border-zinc-800 p-4"><div class="small text-zinc-400">Dejansko</div><div class="result text-3xl mt-1"><span id="t-actual-out">0</span> mm</div></div></div>
-<div class="mt-5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-4"><div class="text-xs text-emerald-200">REZULTAT</div><div class="text-2xl font-extrabold mt-1">Nevarnost ≥ <span id="t-drawing" class="text-emerald-400">0</span> mm od ravnine odprtine</div><div class="mono text-xs mt-3 text-zinc-300" id="t-formula">—</div></div><div id="t-warning" class="mt-4 p-3 rounded-xl bg-yellow-500/5 border border-yellow-500/20 text-xs text-yellow-100/80">—</div></div>
-<div class="card p-5"><h2 class="section-title">Shematski prerez</h2><div class="mt-4 rounded-xl border border-zinc-800 bg-zinc-950 p-6"><div class="flex items-center gap-0 h-24"><div class="w-4 h-full bg-zinc-600 rounded-l"></div><div class="h-14 flex-1 bg-zinc-800 border-y border-zinc-700 relative"><div class="absolute inset-x-0 top-1/2 border-t-2 border-dashed border-emerald-500/50"></div><div class="absolute left-0 -bottom-7 text-[10px] text-zinc-500">ODPRTINA</div></div><div class="w-4 h-full bg-zinc-600 rounded-r"></div><div class="mx-5 w-20 border-t border-zinc-700"></div><div class="w-28 h-14 bg-red-500/15 border border-red-500/60 rounded flex items-center justify-center text-xs font-bold text-red-300">NEVARNOST</div></div><div class="text-center mt-9"><span id="t-visual-distance" class="mono text-sm text-emerald-300">—</span></div></div><div class="help mt-3">Shematski prikaz ni v merilu in je namenjen samo orientaciji. Odločilna je številčna vrednost.</div></div>
+<div class="card p-5">
+<div class="flex justify-between items-start">
+  <div><h2 class="section-title">Kontrola dolžine tunela</h2><p class="text-sm text-zinc-400 mt-1">Minimalna razdalja od vhodne odprtine do nevarnega območja.</p></div>
+  <span id="t-status" class="badge warn">—</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
+  <div class="rounded-xl bg-zinc-950 border border-zinc-800 p-4"><div class="small text-zinc-400">Efektivna odprtina e</div><div class="result text-3xl mt-1 text-emerald-400"><span id="t-e-out">0</span> mm</div></div>
+  <div class="rounded-xl bg-zinc-950 border border-zinc-800 p-4"><div class="small text-zinc-400">Minimalno potrebno</div><div class="result text-3xl mt-1 text-emerald-400"><span id="t-required">0</span> mm</div></div>
+  <div class="rounded-xl bg-zinc-950 border border-zinc-800 p-4"><div class="small text-zinc-400">Dejansko stanje</div><div class="result text-3xl mt-1"><span id="t-actual-out">0</span> mm</div></div>
+</div>
+<div class="mt-5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-4">
+  <div class="text-xs text-emerald-200">REZULTAT KONTROLE</div>
+  <div class="text-2xl font-extrabold mt-1">Nevarnost ≥ <span id="t-drawing" class="text-emerald-400">0</span> mm od ravnine odprtine</div>
+  <div class="mono text-xs mt-3 text-zinc-300" id="t-formula">—</div>
+</div>
+</div>
 </div></div>
 </section>
 
-<section class="card p-5"><div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3"><div><h2 class="section-title">Izvoz rezultatov</h2><p class="text-sm text-zinc-400 mt-1">Izvozi trenutne rezultate izračuna.</p></div><div class="flex gap-2"><button onclick="copySummary()" class="px-3 py-2 text-xs font-bold rounded-lg bg-orange-600 hover:bg-orange-500">Kopiraj povzetek</button><button onclick="exportCSV()" class="px-3 py-2 text-xs font-bold rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-zinc-700">Prenesi CSV</button></div></div><textarea id="summary" readonly class="mt-4 w-full h-44 bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-xs mono text-zinc-300"></textarea></section>
-
-<footer class="text-[11px] text-zinc-500 pb-4">Aplikacija je pripomoček za orientacijski izračun in ne nadomešča celotne ocene tveganja, validacije varnostne funkcije, navodil proizvajalca opreme ali meritve dejanskega časa ustavitve. Reference: ISO 13857:2019 (fizične zaščite in odprtine), ISO 13855 (postavitev varovalnih naprav).</footer>
+<section class="card p-5">
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+  <div><h2 class="section-title">Izvoz podatkov</h2><p class="text-sm text-zinc-400 mt-1">Povzetek izračunanih vrednosti za prenos v poročilo ali beležko.</p></div>
+  <div class="flex gap-2"><button onclick="copySummary()" class="px-3 py-2 text-xs font-bold rounded-lg bg-orange-600 hover:bg-orange-500 text-white">Kopiraj povzetek</button></div>
 </div>
+<textarea id="summary" readonly class="mt-4 w-full h-32 bg-zinc-950 border border-zinc-800 rounded-xl p-3 text-xs mono text-zinc-300"></textarea>
+</section>
+
+<footer class="text-[11px] text-zinc-500 pb-4 text-center">Orodje je projektantski pripomoček skladno z veljavnimi standardi ISO 13857 in ISO 13855 (navedeni v končnem poročilu).</footer>
+</div>
+
 <script>
 const $=id=>document.getElementById(id);let drive='robot',mutingType='L',mutingDrive='robot';
 function showTab(name){document.querySelectorAll('section[id^="tab-"]').forEach(x=>x.classList.add('hidden'));$('tab-'+name).classList.remove('hidden');document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));window.scrollTo({top:0,behavior:'smooth'});}
 function n(id){return parseFloat($(id).value)||0}
-function setDrive(v){drive=v;$('drive-robot').className='drive-btn rounded-xl p-4 border '+(v==='robot'?'border-orange-500/50 bg-orange-500/10':'border-zinc-700 bg-zinc-950');$('drive-pneu').className='drive-btn rounded-xl p-4 border '+(v==='pneu'?'border-orange-500/50 bg-orange-500/10':'border-zinc-700 bg-zinc-950');if($('z-time-mode').value==='preset')$('z-machine').value=v==='robot'?0.150:0.080;calcZavesa();}
+function setDrive(v){drive=v;$('drive-robot').className='drive-btn rounded-xl p-4 border '+(v==='robot'?'border-orange-500/50 bg-orange-500/10':'border-zinc-700 bg-zinc-950')+' text-left';$('drive-pneu').className='drive-btn rounded-xl p-4 border '+(v==='pneu'?'border-orange-500/50 bg-orange-500/10':'border-zinc-700 bg-zinc-950')+' text-left';if($('z-time-mode').value==='preset')$('z-machine').value=v==='robot'?0.150:0.080;calcZavesa();}
 function setMutingDrive(v){mutingDrive=v;const robot=v==='robot';$('m-drive-robot').className='m-drive rounded-xl p-3 border '+(robot?'border-orange-500/40 bg-orange-500/10':'border-zinc-700 bg-zinc-950')+' text-left';$('m-drive-pneu').className='m-drive rounded-xl p-3 border '+(!robot?'border-blue-500/40 bg-blue-500/10':'border-zinc-700 bg-zinc-950')+' text-left';$('m-stop').value=robot?'0.150':'0.080';calcMuting();}
 function setMutingType(v){mutingType=v;document.querySelectorAll('.mtype').forEach(x=>x.className='mtype rounded-lg border p-3 text-xs font-bold '+(x.dataset.m===v?'border-blue-500/40 bg-blue-500/10':'border-zinc-700 bg-zinc-950'));calcMuting();}
-function calcZavesa(){let d=n('z-resolution'),T=n('z-curtain')+n('z-machine')+n('z-relay')+n('z-wear'),K=n('z-k');let C=d<=55?Math.max(0,8*(d-14)):850;let S=Math.max(100,K*T+C);if(S>500&&K===2000){let alt=1600*T+C;if(alt>=500)S=alt;else S=500;}S=Math.ceil(S);$('z-total').textContent=T.toFixed(3);$('z-c').textContent=C.toFixed(0);$('z-s').textContent=S;$('z-drawing').textContent=S;$('z-formula').textContent=`(${K} × ${T.toFixed(3)}) + ${C.toFixed(0)}`;$('z-formula-result').textContent=S+' mm';$('z-status').textContent=drive==='robot'?'Robot – orientacijska prednastavitev':'Pnevmatika – orientacijska prednastavitev';$('z-status').className='badge warn';$('sum-s').textContent=S;$('sum-s-note').textContent=`K=${K} mm/s · T=${T.toFixed(3)} s · C=${C} mm`;$('sum-t').textContent=T.toFixed(3);$('sum-t-note').textContent=drive==='robot'?'Robot – orientacijska prednastavitev':'Pnevmatika – orientacijska prednastavitev';updateSummary();}
+function calcZavesa(){let d=n('z-resolution'),T=n('z-curtain')+n('z-machine')+n('z-relay')+n('z-wear'),K=n('z-k');let C=d<=55?Math.max(0,8*(d-14)):850;let S=Math.max(100,K*T+C);if(S>500&&K===2000){let alt=1600*T+C;if(alt>=500)S=alt;else S=500;}S=Math.ceil(S);$('z-total').textContent=T.toFixed(3);$('z-c').textContent=C.toFixed(0);$('z-s').textContent=S;$('z-drawing').textContent=S;$('z-formula').textContent=`(${K} × ${T.toFixed(3)}) + ${C.toFixed(0)}`;$('z-formula-result').textContent=S+' mm';$('z-status').textContent=drive==='robot'?'Robot – prednastavitev':'Pnevmatika – prednastavitev';$('z-status').className='badge warn';updateSummary();}
 function calcMuting(){let speed=n('m-speed'),T=n('m-stop')+n('m-curtain')+n('m-control')+n('m-reserve'),d=n('m-resolution'),dist=n('m-sensor-dist'),gap=n('m-sensor-gap'),prod=n('m-product');let C=d<=55?Math.max(0,8*(d-14)):850;let K=2000;let S=Math.max(100,K*T+C);if(S>500){let alt=1600*T+C;if(alt>=500)S=alt;else S=500;}S=Math.ceil(S);let sensorResponse=n('m-curtain')+n('m-control')+n('m-reserve');let sensorMin=speed*sensorResponse;let arrival=speed>0?dist/speed:0;let timingOK=dist>=sensorMin;$('m-total').textContent=T.toFixed(3);$('m-s').textContent=S;$('m-drawing').textContent=S;$('m-sensor-min').textContent=Math.ceil(sensorMin);$('m-arrival-time').textContent=arrival.toFixed(3)+' s';$('m-sensor-rule').textContent=Math.ceil(sensorMin)+' mm';let checks=[[timingOK,'Razdalja tipalo → zavesa je dovolj velika za odziv muting sistema'],[prod>0,'Dolžina izdelka je definirana'],[gap>0,'Razmak tipal je definiran'],[mutingType!=='','Način mutinga je izbran']];$('m-checklist').innerHTML=checks.map(x=>`<div class="rounded-lg border p-3 ${x[0]?'ok':'bad'}"><strong>${x[0]?'✓':'✕'}</strong> ${x[1]}</div>`).join('');let ok=checks.every(x=>x[0]);$('m-status').textContent=ok?'KONTROLA OK':'POTREBNA PREVERITEV';$('m-status').className='badge '+(ok?'ok':'bad');updateSummary();}
-function toggleOpeningInputs(){let shape=$('o-shape').value;$('o-b-wrap').classList.toggle('hidden',shape==='round');}
 const upper={slot:[[4,2],[6,10],[8,20],[10,80],[12,100],[20,120],[30,850],[40,850],[120,850]],square:[[4,2],[6,5],[8,15],[10,25],[12,80],[20,120],[30,120],[40,200],[120,850]],round:[[4,2],[6,5],[8,5],[10,20],[12,80],[20,120],[30,120],[40,120],[120,850]]};
 const lower={slot:[[5,0],[15,10],[35,80],[60,180],[80,650],[95,1100],[180,1100],[240,1100]],square:[[5,0],[15,0],[35,25],[60,80],[80,180],[95,650],[180,1100],[240,1100]],round:[[5,0],[15,0],[35,25],[60,80],[80,180],[95,650],[180,1100],[240,1100]]};
 function lookup(table,e){for(let i=0;i<table.length;i++)if(e<=table[i][0])return table[i][1];return Infinity}
-function calcRows(shape){let tbl=upper[shape];return tbl.map(r=>`<div class="grid-table"><div>${r[0]<=12?'Prst / členek':r[0]<=20?'Dlan':'Roka do rame'}</div><div>≤ ${r[0]}</div><div>${r[1]===Infinity?'—':r[1]+' mm'}</div><div class="text-zinc-500">Tabela 4</div></div>`).join('')}
-function calcOdprtine(){let shape=$('o-shape').value,e=n('o-a'),b=n('o-b'),actual=n('o-actual'),body=$('o-body').value;let effective=shape==='round'?e:e;let sr=lookup(body==='upper'?upper[shape]:lower[shape],effective);let tooLarge=(body==='upper'&&effective>120)||(body==='lower'&&effective>240);if(tooLarge)sr=Infinity;$('o-e').textContent=effective.toFixed(1);$('o-actual-out').textContent=actual.toFixed(0);$('o-sr').textContent=sr===Infinity?'—':sr.toFixed(0);let pass=sr!==Infinity&&actual>=sr;$('o-status').textContent=tooLarge?'ODPRTINA IZVEN OBMOČJA TABELE':pass?'USTREZA':'NE USTREZA';$('o-status').className='badge '+(tooLarge?'bad':pass?'ok':'bad');$('o-drawing').textContent=sr===Infinity?'posebna analiza':sr.toFixed(0);$('o-desc').textContent=shape==='slot'?`Reža ${e} × ${b} mm · merodajna ozka mera e=${effective} mm`:shape==='round'?`Krog Ø ${e} mm`:`Pravokotnik ${e} × ${b} mm · uporabljena ozka mera e=${effective} mm`;$('o-warning').textContent=tooLarge?'Odprtina presega področje poenostavljene tabele; potreben je ločen pregled dosega po geometriji zaščite.':'Razdalja je merjena od ravnine zaščite do najbližje dostopne nevarnosti.';$('o-table').innerHTML=calcRows(shape);$('sum-sr').textContent=sr===Infinity?'—':sr;$('sum-sr-note').textContent=tooLarge?'izven področja tabele':`dejansko ${actual} mm`;updateSummary();}
-function calcTunel(){let shape=$('t-shape').value,e=n('t-e'),actual=n('t-l-actual')+n('t-extra');let sr=lookup(upper[shape],e);let tooLarge=e>120;if(tooLarge)sr=Infinity;$('t-e-out').textContent=e.toFixed(0);$('t-required').textContent=sr===Infinity?'—':sr.toFixed(0);$('t-actual-out').textContent=actual.toFixed(0);let pass=sr!==Infinity&&actual>=sr;$('t-status').textContent=tooLarge?'POTREBNA POSEBNA ANALIZA':pass?'TUNEL ZADOSTUJE':'TUNEL JE PREKRATEK';$('t-status').className='badge '+(tooLarge?'warn':pass?'ok':'bad');$('t-formula').textContent=sr===Infinity?`odprtina e=${e} mm → ni enotne tabelarične vrednosti; dejansko ${actual} mm`:`zahteva ≥ ${sr} mm · dejansko = ${actual} mm`;$('t-drawing').textContent=sr===Infinity?'posebna analiza':sr;$('t-visual-distance').textContent=sr===Infinity?'potrebna geometrijska analiza':`minimalno ≥ ${sr} mm`;$('t-warning').textContent=tooLarge?'Za večje odprtine ni primerno uporabiti ene same tabelarične vrednosti. Preveri dejanski možni doseg roke skozi odprtino in obliko tunela po ISO 13857.': 'Za postavitev uporabi minimalno zahtevano razdaljo od ravnine odprtine do najbližje nevarnosti.';$('sum-l').textContent=sr===Infinity?'—':sr;$('sum-l-note').textContent=`dejansko ${actual} mm`;updateSummary();}
-function updateSummary(){let txt='';txt+='KALKULATOR VARNOSTNIH RAZDALJ\n';txt+='================================\n';txt+=`ZAVESA: S = ${$('sum-s').textContent} mm | ${$('sum-s-note').textContent}\n`;txt+=`ODPRTINA: Sr = ${$('sum-sr').textContent} mm | ${$('sum-sr-note').textContent}\n`;txt+=`TUNEL: Lmin = ${$('sum-l').textContent} mm | ${$('sum-l-note').textContent}\n`;txt+=`MUTING: S = ${$('m-s')?$('m-s').textContent:'—'} mm | ${$('m-status')?$('m-status').textContent:'—'}\n\n`;txt+='OPOMBA: orientacijski izračun; končni preračun zahteva dejanske podatke opreme, oceno tveganja in validacijo varnostne funkcije.\n';$('summary').value=txt;}
-function copySummary(){navigator.clipboard.writeText($('summary').value);toast('Povzetek kopiran');}
-function exportCSV(){let lines=['Parameter;Vrednost;Enota;Opomba',`Zavesa S;${$('sum-s').textContent};mm;ISO 13855`,`Odprtina Sr;${$('sum-sr').textContent};mm;ISO 13857:2019`,`Tunel Lmin;${$('sum-l').textContent};mm;orientacijska vrednost`,`Čas ustavitve T;${$('sum-t').textContent};s;orientacijsko`];let blob=new Blob(['\uFEFF'+lines.join('\n')],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='varnostne_razdalje.csv';a.click();URL.revokeObjectURL(a.href);}
-function toast(msg){let d=document.createElement('div');d.textContent=msg;d.className='fixed bottom-5 right-5 z-50 bg-orange-600 text-white px-4 py-3 rounded-lg text-xs font-bold shadow-xl';document.body.appendChild(d);setTimeout(()=>d.remove(),1800)}
-function calcAll(){calcZavesa();calcMuting();toggleOpeningInputs();calcOdprtine();calcTunel();updateSummary();}
+function calcRows(shape){let tbl=upper[shape];return tbl.map(r=>`<div class="grid-table"><div>${r[0]<=12?'Prst / členek':r[0]<=20?'Dlan':'Roka'}</div><div>≤ ${r[0]}</div><div>${r[1]===Infinity?'—':r[1]+' mm'}</div><div class="text-zinc-500">ISO 13857</div></div>`).join('')}
+function toggleOpeningInputs(){let shape=$('o-shape').value;const bWrap=$('o-b-wrap');if(bWrap)bWrap.classList.toggle('hidden',shape==='round');}
+function calcOdprtine(){
+  let shape=$('o-shape').value,
+      a=n('o-a'),
+      b=n('o-b'),
+      actual=n('o-actual'),
+      body=$('o-body').value;
+  
+  // Upoštevanje mer a in b (merodajna je najmanjša dimenzija / kombinacija pri kvadratnih/pravokotnih odprtinah in režah)
+  let e=(shape==='round')?a:Math.min(a,b);
+  
+  let sr=lookup(body==='upper'?upper[shape]:lower[shape],e);
+  let tooLarge=(body==='upper'&&e>120)||(body==='lower'&&e>240);
+  if(tooLarge)sr=Infinity;
+  
+  $('o-e').textContent=e.toFixed(1);
+  $('o-actual-out').textContent=actual.toFixed(0);
+  $('o-sr').textContent=sr===Infinity?'—':sr.toFixed(0);
+  let pass=sr!==Infinity&&actual>=sr;
+  $('o-status').textContent=tooLarge?'IZVEN OBMOČJA':pass?'USTREZA':'NE USTREZA';
+  $('o-status').className='badge '+(tooLarge?'bad':pass?'ok':'bad');
+  $('o-drawing').textContent=sr===Infinity?'posebna analiza':sr.toFixed(0);
+  $('o-desc').textContent=`Oblika: ${shape} · efektivna mera e = ${e.toFixed(1)} mm (a=${a}, b=${b})`;
+  $('o-table').innerHTML=calcRows(shape);
+  updateSummary();
+}
+function calcTunel(){let shape=$('t-shape').value,e=n('t-e'),actual=n('t-l-actual')+n('t-extra');let sr=lookup(upper[shape],e);let tooLarge=e>120;if(tooLarge)sr=Infinity;$('t-e-out').textContent=e.toFixed(0);$('t-required').textContent=sr===Infinity?'—':sr.toFixed(0);$('t-actual-out').textContent=actual.toFixed(0);let pass=sr!==Infinity&&actual>=sr;$('t-status').textContent=tooLarge?'POTREBNA ANALIZA':pass?'ZADOSTUJE':'PREKRATEK';$('t-status').className='badge '+(tooLarge?'warn':pass?'ok':'bad');$('t-formula').textContent=sr===Infinity?`odprtina e=${e} mm`: `zahteva ≥ ${sr} mm · dejansko = ${actual} mm`;$('t-drawing').textContent=sr===Infinity?'posebna analiza':sr;updateSummary();}
+function updateSummary(){let txt=`KALKULATOR VARNOSTNIH RAZDALJ (POROČILO)\n`;txt+=`==========================================\n`;txt+=`Svetlobna zavesa (ISO 13855) [S]: ${$('z-s').textContent} mm\n`;txt+=`Muting varnostna razdalja: ${$('m-s').textContent} mm\n`;txt+=`Odprtina ograje (ISO 13857) [Sr]: ${$('o-sr').textContent} mm\n`;txt+=`Tunel / transporter [L]: ${$('t-required').textContent} mm\n`;$('summary').value=txt;}
+function copySummary(){navigator.clipboard.writeText($('summary').value);alert('Povzetek je kopiran v odložišče!');}
 calcAll();
+function calcAll(){calcZavesa();calcMuting();toggleOpeningInputs();calcOdprtine();calcTunel();updateSummary();}
 </script>
-</body></html>
+</body>
+</html>
